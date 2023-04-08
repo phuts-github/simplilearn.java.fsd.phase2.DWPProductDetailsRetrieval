@@ -1,10 +1,11 @@
-package com.simplilearn.registration;
+package com.simplilearn.productretrieval;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,14 +17,14 @@ import com.mysql.cj.jdbc.Driver;
 /**
  * Servlet implementation class Register
  */
-@WebServlet("/Register")
-public class Register extends HttpServlet {
+@WebServlet("/Product")
+public class Product extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor. 
      */
-    public Register() {
+    public Product() {
         // TODO Auto-generated constructor stub
     }
 
@@ -41,50 +42,47 @@ public class Register extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		// TODO Auto-generated method stub
-		doGet(request, response);
+//		doGet(request, response);
+		
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
-		String name=request.getParameter("userName");
-		String pass=request.getParameter("userPass");
-		String email=request.getParameter("userEmail");
-		String country=request.getParameter("userCountry");
+		String searchProductID=request.getParameter("searchProduct");
 		
         try {
             // 1. Register Connection
             Class.forName("com.mysql.cj.jdbc.Driver");
-//            Class.forName("com.mysql.jdbc");
-            System.out.println("2");
 
             // 2. Get Connection
             Connection connection = DriverManager.getConnection(
-//                    "jdbc:mysql://127.0.0.1:3306/employee?serverTimezone=GMT",
-                    "jdbc:mysql://localhost:3306/employee?serverTimezone=GMT",
-                    "root",
-                    "97257"
+            		Constants.DB_NAME, Constants.DB_USER, Constants.DB_PWD
             );
-            System.out.println("3");
 
             // 3. Create Statement
-            PreparedStatement preparedStmnt = connection.prepareCall("INSERT INTO EMPLOYEE_REGISTRATION VALUES(?,?,?,?)");
-            preparedStmnt.setString(1, name);
-            preparedStmnt.setString(2, pass);
-            preparedStmnt.setString(3, email);
-            preparedStmnt.setString(4, country);
-            
-            System.out.println("prepared statement - ");
-            System.out.println(preparedStmnt);
-            
-            int i = preparedStmnt.executeUpdate();
-            if (i == 1 ) {
-            	System.out.println("Record Inserted");
-            	System.out.println(" i = " + i + ", name - " + name + ", Pass - " + pass + ", Email - " + email + ", Country - " + country);
-            } 
-            else {
-            	System.out.println(" i = " + i + ", error inserting record");
-            }
-            
-            
+            PreparedStatement preparedStmnt = connection.prepareCall(Constants.sqlGET_PRODUCT_BY_ID);
+            preparedStmnt.setString(1, searchProductID);
+          
+	        response.setContentType("text/html");  
+	        
+	        request.getRequestDispatcher("product.html").include(request, response);
+	        
+	        ResultSet resultSet1 = preparedStmnt.executeQuery();
+       
+            if (resultSet1.next()) {
+            	out.print("<br/>" + "Product Id " + searchProductID + " found" + "<br/>");
+            	out.print("<br/>" + "Prod ID: " + resultSet1.getString("PRODUCT_ID"));
+            	out.print("<br/>" + "Name   : " + resultSet1.getString("PROD_NAME"));
+            	out.print("<br/>" + "Color  : " + resultSet1.getString("PROD_COLOR"));
+            	out.print("<br/>" + "Desc   : " + resultSet1.getString("PROD_DESC"));
+            	out.print("<br/>" + "Stock  : " + resultSet1.getString("PROD_QTY"));
+            	out.print("<br/>" + "Price  : " + resultSet1.getString("PROD_PRICE"));
+            }else {
+	        	out.print("<br/>" + "Product Id " + searchProductID + " not found" + "<br/>");
+	        }
+  
+	        out.close(); 
+	        
         } catch (Exception e){
+        	System.out.println("database error");
             System.out.println(e);
 
         };	
