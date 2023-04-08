@@ -85,7 +85,7 @@ public class Product extends HttpServlet {
         	System.out.println("database error");
             System.out.println(e);
 
-        };	
+        };	 
 		
 	};
 
