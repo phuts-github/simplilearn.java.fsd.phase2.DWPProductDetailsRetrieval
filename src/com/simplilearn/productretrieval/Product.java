@@ -84,7 +84,6 @@ public class Product extends HttpServlet {
         } catch (Exception e){
         	System.out.println("database error");
             System.out.println(e);
-
         };	 
 		
 	};

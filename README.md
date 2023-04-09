@@ -1,2 +1,1 @@
-# simplilearn.java.fsd.phase2.DWPUserRegistration
-# simplilearn.java.fsd.phase2.DWPProductDetailsRetrieval
+#simplilearn.java.fsd.phase2.DWPProductDetailsRetrieval
